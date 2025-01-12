@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import phoneService from "./services/personPhone";
+import Notification from "./components/Notification";
 
 const FilterForm = ({ filterName, setFilterName }) => {
   return (
@@ -53,7 +54,7 @@ const Persons = ({ persons, filterName, setPersons }) => {
   );
 };
 
-const AddPersonForm = ({ persons, setPersons }) => {
+const AddPersonForm = ({ persons, setPersons, setMessage }) => {
   const [newName, setNewName] = useState("");
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
 
@@ -83,10 +84,32 @@ const AddPersonForm = ({ persons, setPersons }) => {
         number: newPhoneNumber,
         id: (persons.length + 1).toString(),
       };
-      phoneService.changePhone(duplicatedId, newPerson).then(() => {
-        setPersons(persons.map((p) => (p.id === duplicatedId ? newPerson : p)));
-      });
+      phoneService
+        .changePhone(duplicatedId, newPerson)
+        .then(() => {
+          setPersons(
+            persons.map((p) => (p.id === duplicatedId ? newPerson : p))
+          );
+          notifyAction(`${newName}'s number has been changed.`, false);
+        })
+        .catch((error) => {
+          notifyAction(`${newName} has been deleted from the phonebook.`, true);
+          persons.filter((p) => p !== duplicatedId);
+        });
     }
+  };
+
+  const notifyAction = (msg, isError) => {
+    setMessage({
+      message: msg,
+      isError: isError,
+    });
+    setTimeout(() => {
+      setMessage({
+        message: null,
+        isError: isError,
+      });
+    }, 3000);
   };
 
   const handleAddAction = (event) => {
@@ -103,6 +126,7 @@ const AddPersonForm = ({ persons, setPersons }) => {
     }
 
     addPerson();
+    notifyAction(`${newName} has been added to the phonebook.`, false);
   };
 
   return (
@@ -133,6 +157,8 @@ const AddPersonForm = ({ persons, setPersons }) => {
 // Main app
 const App = () => {
   const [persons, setPersons] = useState([]);
+  const [filterName, setFilterName] = useState("");
+  const [message, setMessage] = useState({ message: null, isError: false });
 
   useEffect(() => {
     phoneService.getAllPhone().then((phones) => {
@@ -141,14 +167,17 @@ const App = () => {
     });
   }, []);
 
-  const [filterName, setFilterName] = useState("");
-
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message.message} isError={message.isError} />
       <FilterForm filterName={filterName} setFilterName={setFilterName} />
       <h2>Add a person</h2>
-      <AddPersonForm persons={persons} setPersons={setPersons} />
+      <AddPersonForm
+        persons={persons}
+        setPersons={setPersons}
+        setMessage={setMessage}
+      />
       <h2>Numbers</h2>
       <Persons
         persons={persons}
