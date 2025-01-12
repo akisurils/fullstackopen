@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const api_key = import.meta.env.VITE_WEATHER_API_KEY;
+
 const CountryInputForm = ({ country, setCountry }) => {
   const handleInputChange = (event) => {
     // console.log(event.target.value);
@@ -20,6 +22,18 @@ const CountryInputForm = ({ country, setCountry }) => {
 };
 
 const CountryDetail = ({ country }) => {
+  const [weatherDetail, setWeatherDetail] = useState(null);
+
+  useEffect(() => {
+    axios
+      .get(`http://api.weatherapi.com/v1/current.json?key=${api_key}`, {
+        params: { q: country.capital[0] },
+      })
+      .then((response) => {
+        setWeatherDetail(response.data);
+      });
+  }, [country.capital]);
+
   return (
     <div>
       {country.name.common}
@@ -33,6 +47,19 @@ const CountryDetail = ({ country }) => {
         ))}
       </ul>
       <img width={100} src={country.flags.svg} alt={country.flags.alt} />
+      <h3>Weather in {country.capital[0]}</h3>
+      {weatherDetail === null ? (
+        <div>Loading weather detail</div>
+      ) : (
+        <div>
+          <div>Temperature {weatherDetail.current.temp_c} Celcius</div>
+          <img
+            src={weatherDetail.current.condition.icon}
+            alt={weatherDetail.current.condition.text}
+          />
+          <div>Wind {weatherDetail.current.wind_kph} kph</div>
+        </div>
+      )}
     </div>
   );
 };
