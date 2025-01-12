@@ -13,7 +13,18 @@ const FilterForm = ({ filterName, setFilterName }) => {
   );
 };
 
-const Persons = ({ persons, filterName }) => {
+const Persons = ({ persons, filterName, setPersons }) => {
+  const handleDelete = (person) => {
+    const confirmed = window.confirm(
+      `Do you want to delete ${person.name} phone number?`
+    );
+
+    if (confirmed)
+      phoneService
+        .deletePhone(person.id)
+        .then(setPersons(persons.filter((p) => p.id !== person.id)));
+  };
+
   return (
     <div>
       {persons
@@ -27,7 +38,14 @@ const Persons = ({ persons, filterName }) => {
         .map((person) => {
           return (
             <div key={person.id}>
-              {person.name} {person.number} <button>Delete</button>
+              {person.name} {person.number}{" "}
+              <button
+                onClick={() => {
+                  handleDelete(person);
+                }}
+              >
+                Delete
+              </button>
             </div>
           );
         })}
@@ -112,7 +130,11 @@ const App = () => {
       <h2>Add a person</h2>
       <AddPersonForm persons={persons} setPersons={setPersons} />
       <h2>Numbers</h2>
-      <Persons persons={persons} filterName={filterName} />
+      <Persons
+        persons={persons}
+        filterName={filterName}
+        setPersons={setPersons}
+      />
     </div>
   );
 };
