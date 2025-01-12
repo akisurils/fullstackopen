@@ -57,20 +57,7 @@ const AddPersonForm = ({ persons, setPersons }) => {
   const [newName, setNewName] = useState("");
   const [newPhoneNumber, setNewPhoneNumber] = useState("");
 
-  const addPerson = (event) => {
-    event.preventDefault();
-
-    if (
-      persons.find(
-        (person) => person.name.toUpperCase() === newName.toUpperCase()
-      ) != undefined
-    ) {
-      alert(newName + " has already exist!");
-      setNewName("");
-      setNewPhoneNumber("");
-      return;
-    }
-
+  const addPerson = () => {
     const newPerson = {
       name: newName,
       number: newPhoneNumber,
@@ -83,6 +70,39 @@ const AddPersonForm = ({ persons, setPersons }) => {
 
     setNewPhoneNumber("");
     setNewName("");
+  };
+
+  const handleDuplicateName = (duplicatedId) => {
+    const replacing = window.confirm(
+      `${newName} has already existed in the phonebook. Replace the old number with the new one?`
+    );
+
+    if (replacing) {
+      const newPerson = {
+        name: newName,
+        number: newPhoneNumber,
+        id: (persons.length + 1).toString(),
+      };
+      phoneService.changePhone(duplicatedId, newPerson).then(() => {
+        setPersons(persons.map((p) => (p.id === duplicatedId ? newPerson : p)));
+      });
+    }
+  };
+
+  const handleAddAction = (event) => {
+    event.preventDefault();
+    let duplicatedId = persons.find(
+      (person) => person.name.toUpperCase() === newName.toUpperCase()
+    );
+    if (duplicatedId != undefined) {
+      // console.log(duplicatedId);
+      handleDuplicateName(duplicatedId.id);
+      setNewPhoneNumber("");
+      setNewName("");
+      return;
+    }
+
+    addPerson();
   };
 
   return (
@@ -104,7 +124,7 @@ const AddPersonForm = ({ persons, setPersons }) => {
         />
       </div>
       <div>
-        <button onClick={addPerson}>add</button>
+        <button onClick={handleAddAction}>add</button>
       </div>
     </form>
   );
