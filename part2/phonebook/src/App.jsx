@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import phoneService from "./services/personPhone";
 
 const FilterForm = ({ filterName, setFilterName }) => {
   return (
@@ -27,7 +27,7 @@ const Persons = ({ persons, filterName }) => {
         .map((person) => {
           return (
             <div key={person.id}>
-              {person.name} {person.number}
+              {person.name} {person.number} <button>Delete</button>
             </div>
           );
         })}
@@ -56,9 +56,13 @@ const AddPersonForm = ({ persons, setPersons }) => {
     const newPerson = {
       name: newName,
       number: newPhoneNumber,
-      id: persons.length + 1,
+      id: (persons.length + 1).toString(),
     };
-    setPersons(persons.concat(newPerson));
+
+    phoneService.addPhone(newPerson).then(() => {
+      setPersons(persons.concat(newPerson));
+    });
+
     setNewPhoneNumber("");
     setNewName("");
   };
@@ -93,8 +97,9 @@ const App = () => {
   const [persons, setPersons] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    phoneService.getAllPhone().then((phones) => {
+      console.log(phones);
+      setPersons(phones);
     });
   }, []);
 
