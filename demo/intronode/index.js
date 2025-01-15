@@ -3,8 +3,8 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-app.use(express.json());
 app.use(express.static("dist"));
+app.use(express.json());
 app.use(cors());
 
 let notes = [
@@ -41,6 +41,40 @@ app.get("/api/notes/:id", (request, response) => {
   } else {
     response.status(404).end("Nahh bro tripping ts aint exist");
   }
+});
+
+app.put("/api/notes/:id", (request, response) => {
+  const id = request.params.id;
+  const body = request.body;
+  const oldNote = notes.find((n) => n.id === id);
+
+  if (!body.content) {
+    return response.status(400).end("missing content");
+  }
+
+  if (!body.id) {
+    return response.status(400).end("missing id");
+  }
+
+  if (!Object.hasOwn(body, "important")) {
+    // console.log(body.important);
+    return response.status(400).end("missing important");
+  }
+
+  if (!oldNote) {
+    return response.status(404).end("note does not exist");
+  }
+
+  const newNote = {
+    id: body.id,
+    content: body.content,
+    important: body.important,
+  };
+  notes = notes.map((n) => {
+    return n.id === id ? newNote : n;
+  });
+  // console.log(notes);
+  return response.status(200).json(newNote);
 });
 
 app.delete("/api/notes/:id", (request, response) => {
