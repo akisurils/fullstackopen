@@ -1,8 +1,11 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const app = express();
 app.use(express.json());
+app.use(express.static("dist"));
+app.use(cors());
 
 morgan.token("reqbody", (request, response) => {
   return JSON.stringify(request.body);
@@ -92,6 +95,25 @@ app.post("/api/persons", (request, response) => {
   const id = Math.floor(Math.random() * 9999999999);
   newPerson = { name, number, id };
   persons = persons.concat(newPerson);
+  return response.json(newPerson);
+});
+
+app.put("/api/persons/:id", (request, response) => {
+  const body = request.body;
+  const name = body.name;
+  const number = body.number;
+  const id = body.id;
+
+  if (!name) {
+    return response.status(400).end("missing name");
+  }
+
+  if (!number) {
+    return response.status(400).end("missing number");
+  }
+
+  newPerson = { name, number, id };
+  persons = persons.map((p) => (p.id === id ? newPerson : p));
   return response.json(newPerson);
 });
 
