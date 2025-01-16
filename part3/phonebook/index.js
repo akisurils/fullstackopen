@@ -79,6 +79,7 @@ app.post("/api/persons", (request, response) => {
   const body = request.body;
   const name = body.name;
   const number = body.number;
+  const id = body.id;
 
   if (!name) {
     return response.status(400).end("missing name");
@@ -92,7 +93,10 @@ app.post("/api/persons", (request, response) => {
     return response.status(400).end("name must be unique");
   }
 
-  const id = Math.floor(Math.random() * 9999999999);
+  if (persons.find((person) => person.id === id)) {
+    return response.status(400).end("id must be unique");
+  }
+
   newPerson = { name, number, id };
   persons = persons.concat(newPerson);
   return response.json(newPerson);
