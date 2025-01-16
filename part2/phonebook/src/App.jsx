@@ -14,7 +14,20 @@ const FilterForm = ({ filterName, setFilterName }) => {
   );
 };
 
-const Persons = ({ persons, filterName, setPersons }) => {
+const Persons = ({ persons, filterName, setPersons, setMessage }) => {
+  const notifyAction = (msg, isError) => {
+    setMessage({
+      message: msg,
+      isError: isError,
+    });
+    setTimeout(() => {
+      setMessage({
+        message: null,
+        isError: isError,
+      });
+    }, 3000);
+  };
+
   const handleDelete = (person) => {
     const confirmed = window.confirm(
       `Do you want to delete ${person.name} phone number?`
@@ -23,7 +36,12 @@ const Persons = ({ persons, filterName, setPersons }) => {
     if (confirmed)
       phoneService
         .deletePhone(person.id)
-        .then(setPersons(persons.filter((p) => p.id !== person.id)));
+        .then(setPersons(persons.filter((p) => p.id !== person.id)))
+        .catch((er) => {
+          notifyAction(
+            `${person.name} has already been deleted from the phone book.`
+          );
+        });
   };
 
   return (
@@ -93,7 +111,10 @@ const AddPersonForm = ({ persons, setPersons, setMessage }) => {
           notifyAction(`${newName}'s number has been changed.`, false);
         })
         .catch((error) => {
-          notifyAction(`${newName} has been deleted from the phonebook.`, true);
+          notifyAction(
+            `${newName} has been deleted from the phonebook.`,
+            false
+          );
           persons.filter((p) => p !== duplicatedId);
         });
     }
@@ -183,6 +204,7 @@ const App = () => {
         persons={persons}
         filterName={filterName}
         setPersons={setPersons}
+        setMessage={setMessage}
       />
     </div>
   );
