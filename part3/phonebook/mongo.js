@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
-const url =
-  "mongodb+srv://akisurils:Hieu201004@cluster0.oxjm4.mongodb.net/phonebook?retryWrites=true&w=majority&appName=Cluster0";
+const password = process.argv[2];
+const url = `mongodb+srv://akisurils:${password}@cluster0.oxjm4.mongodb.net/phonebook?retryWrites=true&w=majority&appName=Cluster0`;
 
 mongoose.set("strictQuery", false);
 
