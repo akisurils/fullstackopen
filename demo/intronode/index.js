@@ -50,24 +50,24 @@ app.get("/", (request, response) => {
 app.get("/api/notes", (request, response) => {
     Note.find({}).then((notes) => {
         response.json(notes);
-        console.log(notes);
     });
 });
 
 app.get("/api/notes/:id", (request, response) => {
     const id = request.params.id;
-    const note = notes.find((n) => n.id === id);
-    if (note) {
-        response.json(note);
-    } else {
-        response.status(404).end("Nahh bro tripping ts aint exist");
-    }
+    Note.find({ _id: id }).then((notes) => {
+        const note = notes.find((n) => n.id === id);
+        if (note) {
+            response.json(note);
+        } else {
+            response.status(404).end("Nahh bro tripping ts aint exist");
+        }
+    });
 });
 
 app.put("/api/notes/:id", (request, response) => {
-    const id = request.params.id;
+    const _id = request.params.id;
     const body = request.body;
-    const oldNote = notes.find((n) => n.id === id);
 
     if (!body.content) {
         return response.status(400).end("missing content");
@@ -82,17 +82,21 @@ app.put("/api/notes/:id", (request, response) => {
         return response.status(400).end("missing important");
     }
 
+    let oldNote;
+    Note.find({ _id: id }).then((notes) => {
+        const oldNote = notes.find((n) => n.id === id);
+    });
     if (!oldNote) {
         return response.status(404).end("note does not exist");
     }
 
     const newNote = {
-        id: body.id,
+        _id: body.id,
         content: body.content,
         important: body.important,
     };
     notes = notes.map((n) => {
-        return n.id === id ? newNote : n;
+        return n._id === _id ? newNote : n;
     });
     // console.log(notes);
     return response.status(200).json(newNote);
@@ -119,15 +123,15 @@ app.post("/api/notes", (request, response) => {
         return response.status(400).json({ error: "content missing" });
     }
 
-    const note = {
+    const note = new Note({
         content: body.content,
         important: Boolean(body.important) || false,
-        id: generatedId(),
-    };
+    });
 
-    notes = notes.concat(note);
-
-    response.json(note);
+    note.save().then((result) => {
+        console.log(note);
+        response.json(note);
+    });
 });
 
 const PORT = process.env.PORT || 3001;
