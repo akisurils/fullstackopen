@@ -1,17 +1,24 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const dotenv = require("dotenv").config();
 const mongoose = require("mongoose");
+const dotenv = require("dotenv").config();
 
 const app = express();
 app.use(express.json());
 app.use(express.static("dist"));
 app.use(cors());
 
-const url = process.env.VITE_MONGODB_URL;
+const url = process.env.VITE_MONGODB_URI;
 mongoose.set("strictQuery", false);
 mongoose.connect(url);
+
+const phoneNumberSchema = mongoose.Schema({
+    name: String,
+    number: String,
+});
+
+const PhoneNumber = mongoose.model("PhoneNumber", phoneNumberSchema);
 
 morgan.token("reqbody", (request, response) => {
     return JSON.stringify(request.body);
@@ -56,11 +63,16 @@ app.get("/info", (request, response) => {
 
 app.get("/api/persons", (request, response) => {
     response.send(persons);
+    PhoneNumber.find({}).then((phoneNumber) => {
+        response.json(phoneNumber);
+    });
 });
 
 app.get("/api/persons/:id", (request, response) => {
     const id = request.params.id;
-    const person = persons.find((person) => person.id === id);
+    PhoneNumber.find({ _id: id }).then((phoneNumber) => {
+        const note = notes.find((n) => (n._id = id));
+    });
 
     if (!person) {
         return response.status(404).end("404 not found");
