@@ -35,8 +35,8 @@ const Persons = ({ persons, filterName, setPersons, setMessage }) => {
 
         if (confirmed)
             phoneService
-                .deletePhone(person.id)
-                .then(setPersons(persons.filter((p) => p.id !== person.id)))
+                .deletePhone(person._id)
+                .then(setPersons(persons.filter((p) => p._id !== person._id)))
                 .catch((er) => {
                     notifyAction(
                         `${person.name} has already been deleted from the phone book.`
@@ -58,7 +58,7 @@ const Persons = ({ persons, filterName, setPersons, setMessage }) => {
                 })
                 .map((person) => {
                     return (
-                        <div key={person.id}>
+                        <div key={person._id}>
                             {person.name} {person.number}{" "}
                             <button
                                 onClick={() => {
@@ -82,7 +82,6 @@ const AddPersonForm = ({ persons, setPersons, setMessage }) => {
         const newPerson = {
             name: newName,
             number: newPhoneNumber,
-            id: (persons.length + 1).toString(),
         };
 
         phoneService.addPhone(newPerson).then(() => {
@@ -102,14 +101,13 @@ const AddPersonForm = ({ persons, setPersons, setMessage }) => {
             const newPerson = {
                 name: newName,
                 number: newPhoneNumber,
-                id: (persons.length + 1).toString(),
             };
             phoneService
                 .changePhone(duplicatedId, newPerson)
                 .then(() => {
                     setPersons(
                         persons.map((p) =>
-                            p.id === duplicatedId ? newPerson : p
+                            p._id === duplicatedId ? newPerson : p
                         )
                     );
                     notifyAction(
@@ -147,7 +145,7 @@ const AddPersonForm = ({ persons, setPersons, setMessage }) => {
         );
         if (duplicatedId != undefined) {
             // console.log(duplicatedId);
-            handleDuplicateName(duplicatedId.id);
+            handleDuplicateName(duplicatedId._id);
             setNewPhoneNumber("");
             setNewName("");
             return;
