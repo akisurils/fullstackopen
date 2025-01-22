@@ -94,7 +94,6 @@ app.post("/api/persons", (request, response) => {
     const body = request.body;
     const name = body.name;
     const number = body.number;
-    const id = body.id;
 
     if (!name) {
         return response.status(400).end("missing name");
@@ -104,17 +103,16 @@ app.post("/api/persons", (request, response) => {
         return response.status(400).end("missing number");
     }
 
-    if (persons.find((person) => person.name === name)) {
-        return response.status(400).end("name must be unique");
-    }
+    PhoneNumber.find({ name }).then((phoneNumber) => {
+        if (phoneNumber) {
+            return response.status(400).end("name must be unique");
+        }
+    });
 
-    if (persons.find((person) => person.id === id)) {
-        return response.status(400).end("id must be unique");
-    }
-
-    newPerson = { name, number, id };
-    persons = persons.concat(newPerson);
-    return response.json(newPerson);
+    const newPhoneNumber = new PhoneNumber({ name, number });
+    newPhoneNumber.save().then((result) => {
+        response.json(newPhoneNumber);
+    });
 });
 
 app.put("/api/persons/:id", (request, response) => {
