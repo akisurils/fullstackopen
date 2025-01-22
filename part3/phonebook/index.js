@@ -62,7 +62,6 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-    response.send(persons);
     PhoneNumber.find({}).then((phoneNumber) => {
         response.json(phoneNumber);
     });
@@ -70,20 +69,27 @@ app.get("/api/persons", (request, response) => {
 
 app.get("/api/persons/:id", (request, response) => {
     const id = request.params.id;
-    PhoneNumber.find({ _id: id }).then((phoneNumber) => {
-        const note = notes.find((n) => (n._id = id));
+    const phoneNumbers = PhoneNumber.find({ _id: id }).then((phoneNumber) => {
+        console.log(phoneNumber);
+        if (phoneNumber) {
+            response.json(phoneNumber);
+        } else {
+            response.status(404).end("Phone number not found");
+        }
     });
-
-    if (!person) {
-        return response.status(404).end("404 not found");
-    }
-
-    return response.send(person);
 });
 
 app.delete("/api/persons/:id", (request, response) => {
     const id = request.params.id;
-    const person = persons.find((person) => person.id === id);
+    const phoneNumbers = PhoneNumber.find({ _id: id }).then((phoneNumber) => {
+        const note = notes.find((n) => (n._id = id));
+    });
+
+    if (phoneNumbers) {
+        response.json(phoneNumbers);
+    } else {
+        response.status(404).end("Phone number not found");
+    }
 
     if (!person) {
         return response.status(404).end("404 not found");
