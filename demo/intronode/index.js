@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config();
 const Note = require("./models/note");
+const { default: mongoose } = require("mongoose");
 
 const app = express();
 app.use(express.static("dist"));
@@ -63,6 +64,10 @@ app.put("/api/notes/:id", (request, response) => {
     if (!Object.hasOwn(body, "important")) {
         // console.log(body.important);
         return response.status(400).end("missing important");
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(400).end("Invalid id");
     }
 
     Note.findById(id)
