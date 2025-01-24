@@ -35,8 +35,8 @@ const Persons = ({ persons, filterName, setPersons, setMessage }) => {
 
         if (confirmed)
             phoneService
-                .deletePhone(person._id)
-                .then(setPersons(persons.filter((p) => p._id !== person._id)))
+                .deletePhone(person.id)
+                .then(setPersons(persons.filter((p) => p.id !== person.id)))
                 .catch((er) => {
                     notifyAction(
                         `${person.name} has already been deleted from the phone book.`
@@ -58,7 +58,7 @@ const Persons = ({ persons, filterName, setPersons, setMessage }) => {
                 })
                 .map((person) => {
                     return (
-                        <div key={person._id}>
+                        <div key={person.id}>
                             {person.name} {person.number}{" "}
                             <button
                                 onClick={() => {
@@ -107,7 +107,7 @@ const AddPersonForm = ({ persons, setPersons, setMessage }) => {
                 .then(() => {
                     setPersons(
                         persons.map((p) =>
-                            p._id === duplicatedId ? newPerson : p
+                            p.id === duplicatedId ? newPerson : p
                         )
                     );
                     notifyAction(
@@ -145,7 +145,7 @@ const AddPersonForm = ({ persons, setPersons, setMessage }) => {
         );
         if (duplicatedId != undefined) {
             // console.log(duplicatedId);
-            handleDuplicateName(duplicatedId._id);
+            handleDuplicateName(duplicatedId.id);
             setNewPhoneNumber("");
             setNewName("");
             return;
