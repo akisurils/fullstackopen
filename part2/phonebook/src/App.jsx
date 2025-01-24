@@ -188,7 +188,6 @@ const App = () => {
 
     useEffect(() => {
         phoneService.getAllPhone().then((phones) => {
-            console.log(phones);
             setPersons(phones);
         });
     }, []);

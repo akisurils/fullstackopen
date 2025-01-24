@@ -1,7 +1,6 @@
 const http = require("http");
 const express = require("express");
 const cors = require("cors");
-const mongoose = require("mongoose");
 const dotenv = require("dotenv").config();
 
 const app = express();
@@ -26,22 +25,6 @@ let notes = [
         important: true,
     },
 ];
-
-const url = process.env.VITE_MONGODB_URI;
-
-mongoose.set("strictQuery", false);
-mongoose.connect(url);
-
-const noteSchema = new mongoose.Schema({
-    content: String,
-    important: Boolean,
-});
-
-const Note = mongoose.model("Note", noteSchema);
-const note = new Note({
-    content: "Mongoose make thing easy",
-    important: true,
-});
 
 app.get("/", (request, response) => {
     response.send("<h1>Hello WORLD!</h1>");
