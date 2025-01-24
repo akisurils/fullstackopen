@@ -3,6 +3,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv").config();
 const PhoneNumber = require("./models/phonenumber");
+const { default: mongoose } = require("mongoose");
 
 const app = express();
 app.use(express.json());
@@ -58,6 +59,9 @@ app.get("/api/persons", (request, response) => {
 
 app.get("/api/persons/:id", (request, response) => {
     const id = request.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(400).end("Invalid id");
+    }
     PhoneNumber.find({ _id: id }).then((phoneNumber) => {
         console.log(phoneNumber);
         if (phoneNumber) {
@@ -70,6 +74,9 @@ app.get("/api/persons/:id", (request, response) => {
 
 app.delete("/api/persons/:id", (request, response) => {
     const id = request.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(400).end("Invalid id");
+    }
     PhoneNumber.deleteOne({ _id: id })
         .then(() => {
             response.status(204).end();
@@ -109,6 +116,10 @@ app.put("/api/persons/:id", (request, response) => {
     const name = body.name;
     const number = body.number;
     const id = body.id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(400).end("Invalid id");
+    }
 
     if (!name) {
         return response.status(400).end("missing name");
