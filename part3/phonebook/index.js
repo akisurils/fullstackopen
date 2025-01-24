@@ -1,24 +1,13 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const mongoose = require("mongoose");
 const dotenv = require("dotenv").config();
+const PhoneNumber = require("./models/phonenumber");
 
 const app = express();
 app.use(express.json());
 app.use(express.static("dist"));
 app.use(cors());
-
-const url = process.env.VITE_MONGODB_URI;
-mongoose.set("strictQuery", false);
-mongoose.connect(url);
-
-const phoneNumberSchema = mongoose.Schema({
-    name: String,
-    number: String,
-});
-
-const PhoneNumber = mongoose.model("PhoneNumber", phoneNumberSchema);
 
 morgan.token("reqbody", (request, response) => {
     return JSON.stringify(request.body);
