@@ -2,6 +2,7 @@ const http = require("http");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv").config();
+const Note = require("./models/note");
 
 const app = express();
 app.use(express.static("dist"));
@@ -38,18 +39,17 @@ app.get("/api/notes", (request, response) => {
 
 app.get("/api/notes/:id", (request, response) => {
     const id = request.params.id;
-    Note.find({ _id: id }).then((notes) => {
-        const note = notes.find((n) => n.id === id);
-        if (note) {
+    Note.findById(id)
+        .then((note) => {
             response.json(note);
-        } else {
-            response.status(404).end("Nahh bro tripping ts aint exist");
-        }
-    });
+        })
+        .catch((error) =>
+            response.status(404).end("UHH NOT FOUND", error.messsage)
+        );
 });
 
 app.put("/api/notes/:id", (request, response) => {
-    const _id = request.params.id;
+    const id = request.params.id;
     const body = request.body;
 
     if (!body.content) {
@@ -65,24 +65,14 @@ app.put("/api/notes/:id", (request, response) => {
         return response.status(400).end("missing important");
     }
 
-    let oldNote;
-    Note.find({ _id: id }).then((notes) => {
-        const oldNote = notes.find((n) => n.id === id);
-    });
-    if (!oldNote) {
-        return response.status(404).end("note does not exist");
-    }
-
-    const newNote = {
-        _id: body.id,
-        content: body.content,
-        important: body.important,
-    };
-    notes = notes.map((n) => {
-        return n._id === _id ? newNote : n;
-    });
-    // console.log(notes);
-    return response.status(200).json(newNote);
+    Note.findById(id)
+        .then((note) => {
+            note.important = body.important;
+            response.status(200).json(note);
+        })
+        .catch((error) => {
+            response.status(404).end("Error:", error);
+        });
 });
 
 app.delete("/api/notes/:id", (request, response) => {
