@@ -62,14 +62,18 @@ app.get("/api/persons/:id", (request, response) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return response.status(400).end("Invalid id");
     }
-    PhoneNumber.find({ _id: id }).then((phoneNumber) => {
-        console.log(phoneNumber);
-        if (phoneNumber) {
-            response.json(phoneNumber);
-        } else {
-            response.status(404).end("Phone number not found");
-        }
-    });
+    PhoneNumber.findById(id)
+        .then((phoneNumber) => {
+            if (!phoneNumber) {
+                response.status(404).end("Phone number not found");
+            } else {
+                response.json(phoneNumber);
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+            response.status(500).end("Unexpected error:", error);
+        });
 });
 
 app.delete("/api/persons/:id", (request, response) => {
