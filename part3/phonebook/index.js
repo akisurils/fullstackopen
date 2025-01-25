@@ -42,6 +42,12 @@ let persons = [
     },
 ];
 
+const unexpectedErrorHandler = (error, request, response, next) => {
+    console.log(error.message);
+    response.status(500).end("Unexpected error");
+    next(error);
+};
+
 app.get("/info", (request, response) => {
     const currentDate = Date(Date.now);
     response.send(
@@ -52,12 +58,14 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-    PhoneNumber.find({}).then((phoneNumber) => {
-        response.json(phoneNumber);
-    });
+    PhoneNumber.find({})
+        .then((phoneNumber) => {
+            response.json(phoneNumber);
+        })
+        .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
     const id = request.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return response.status(400).end("Invalid id");
@@ -71,8 +79,7 @@ app.get("/api/persons/:id", (request, response) => {
             }
         })
         .catch((error) => {
-            console.log(error);
-            response.status(500).end("Unexpected error:", error);
+            next(error);
         });
 });
 
@@ -83,14 +90,15 @@ app.delete("/api/persons/:id", (request, response) => {
     }
     PhoneNumber.deleteOne({ _id: id })
         .then(() => {
+            console.log(response);
             response.status(204).end();
         })
         .catch((error) => {
-            response.json(error);
+            next(error);
         });
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
     const body = request.body;
     const name = body.name;
     const number = body.number;
@@ -103,16 +111,21 @@ app.post("/api/persons", (request, response) => {
         return response.status(400).end("missing number");
     }
 
-    PhoneNumber.find({ name }).then((phoneNumber) => {
-        if (phoneNumber) {
-            return response.status(400).end("name must be unique");
-        }
-    });
+    PhoneNumber.find({ name })
+        .then((phoneNumber) => {
+            if (phoneNumber) {
+                return response.status(400).end("name must be unique");
+            }
+        })
+        .catch((error) => next(error));
 
     const newPhoneNumber = new PhoneNumber({ name, number });
-    newPhoneNumber.save().then((result) => {
-        response.json(newPhoneNumber);
-    });
+    newPhoneNumber
+        .save()
+        .then((result) => {
+            response.json(newPhoneNumber);
+        })
+        .error((error) => next(error));
 });
 
 app.put("/api/persons/:id", (request, response) => {
@@ -143,6 +156,7 @@ const unknownEndpoint = (request, response) => {
 };
 
 app.use(unknownEndpoint);
+app.use(unexpectedErrorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT);
