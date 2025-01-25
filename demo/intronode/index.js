@@ -10,6 +10,15 @@ app.use(express.static("dist"));
 app.use(express.json());
 app.use(cors());
 
+const errorHandler = (error, request, response, next) => {
+    if (error.name === "CastError") {
+        console.log(error.message);
+        return response.status(400).send({ error: error.message });
+    }
+    response.status(500).end("Unexpected error");
+    next(error);
+};
+
 let notes = [
     {
         id: "1",
