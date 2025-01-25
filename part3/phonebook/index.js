@@ -113,19 +113,20 @@ app.post("/api/persons", (request, response, next) => {
 
     PhoneNumber.find({ name })
         .then((phoneNumber) => {
-            if (phoneNumber) {
+            console.log(phoneNumber);
+            if (phoneNumber.length !== 0) {
                 return response.status(400).end("name must be unique");
             }
+            const newPhoneNumber = new PhoneNumber({ name, number });
+            newPhoneNumber
+                .save()
+                .then((result) => {
+                    response.json(newPhoneNumber);
+                })
+                .catch((error) => next(error));
+            console.log("saved new phone number");
         })
         .catch((error) => next(error));
-
-    const newPhoneNumber = new PhoneNumber({ name, number });
-    newPhoneNumber
-        .save()
-        .then((result) => {
-            response.json(newPhoneNumber);
-        })
-        .error((error) => next(error));
 });
 
 app.put("/api/persons/:id", (request, response) => {
