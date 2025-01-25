@@ -133,11 +133,7 @@ app.put("/api/persons/:id", (request, response) => {
     const body = request.body;
     const name = body.name;
     const number = body.number;
-    const id = body.id;
-
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return response.status(400).end("Invalid id");
-    }
+    const id = request.params.id;
 
     if (!name) {
         return response.status(400).end("missing name");
@@ -147,9 +143,19 @@ app.put("/api/persons/:id", (request, response) => {
         return response.status(400).end("missing number");
     }
 
-    newPerson = { name, number, id };
-    persons = persons.map((p) => (p.id === id ? newPerson : p));
-    return response.json(newPerson);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return response.status(400).end("Invalid id");
+    }
+
+    PhoneNumber.findById(id)
+        .then((phoneNumber) => {
+            phoneNumber.number = body.number;
+            console.log(phoneNumber.number);
+            phoneNumber.save().then(() => {
+                return response.json({ name, number, id });
+            });
+        })
+        .catch((error) => next(error));
 });
 
 const unknownEndpoint = (request, response) => {
