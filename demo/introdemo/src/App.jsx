@@ -65,15 +65,15 @@ const App = () => {
         setNewNote(event.target.value);
     };
 
-    const toggleImportance = (_id) => {
-        console.log(`importance of ${_id} need to be toggle`);
-        const note = notes.find((note) => note._id === _id);
+    const toggleImportance = (id) => {
+        console.log(`importance of ${id} need to be toggle`);
+        const note = notes.find((note) => note.id === id);
         const changedNote = { ...note, important: !note.important };
 
         noteService //
-            .update(_id, changedNote)
+            .update(id, changedNote)
             .then((returnedNote) => {
-                setNotes(notes.map((n) => (n._id === _id ? returnedNote : n)));
+                setNotes(notes.map((n) => (n.id === id ? returnedNote : n)));
             })
             .catch((error) => {
                 setErrorMessage(
@@ -82,7 +82,7 @@ const App = () => {
                 setTimeout(() => {
                     setErrorMessage(null);
                 }, 5000);
-                setNotes(notes.filter((n) => n._id !== _id));
+                setNotes(notes.filter((n) => n.id !== id));
             });
     };
 
@@ -97,9 +97,9 @@ const App = () => {
             </div>
             {notesToShow.map((note) => (
                 <Note
-                    key={note._id}
+                    key={note.id}
                     note={note}
-                    toggleImportance={() => toggleImportance(note._id)}
+                    toggleImportance={() => toggleImportance(note.id)}
                 />
             ))}
             <form onSubmit={addNote}>
