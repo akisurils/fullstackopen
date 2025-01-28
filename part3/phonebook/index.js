@@ -44,6 +44,9 @@ let persons = [
 
 const unexpectedErrorHandler = (error, request, response, next) => {
     console.log(error.message);
+    if (error.name === "ValidationError") {
+        return response.status(400).json({ error: error.message });
+    }
     response.status(500).end("Unexpected error");
     next(error);
 };
@@ -113,7 +116,6 @@ app.post("/api/persons", (request, response, next) => {
 
     PhoneNumber.find({ name })
         .then((phoneNumber) => {
-            console.log(phoneNumber);
             if (phoneNumber.length !== 0) {
                 return response.status(400).end("name must be unique");
             }
@@ -121,10 +123,10 @@ app.post("/api/persons", (request, response, next) => {
             newPhoneNumber
                 .save()
                 .then((result) => {
+                    console.log("saved new phone number");
                     response.json(newPhoneNumber);
                 })
                 .catch((error) => next(error));
-            console.log("saved new phone number");
         })
         .catch((error) => next(error));
 });
