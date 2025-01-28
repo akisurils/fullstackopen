@@ -11,9 +11,11 @@ app.use(express.json());
 app.use(cors());
 
 const errorHandler = (error, request, response, next) => {
-    if (error.name === "CastError") {
+    if (error.name === "ValidationError") {
         console.log(error.message);
-        return response.status(400).send({ error: error.message });
+        return response.status(400).json({ error: error.message });
+    } else if (error.name === "CastError") {
+        return response.status(400).json({ error: error.message });
     }
     response.status(500).end("Unexpected error");
     next(error);
@@ -104,7 +106,7 @@ const generatedId = () => {
     return String(maxId + 1);
 };
 
-app.post("/api/notes", (request, response) => {
+app.post("/api/notes", (request, response, next) => {
     const body = request.body;
     if (!body.content) {
         return response.status(400).json({ error: "content missing" });
@@ -115,11 +117,15 @@ app.post("/api/notes", (request, response) => {
         important: Boolean(body.important) || false,
     });
 
-    note.save().then((result) => {
-        console.log(note);
-        response.json(note);
-    });
+    note.save()
+        .then((result) => {
+            console.log(note);
+            response.json(note);
+        })
+        .catch((error) => next(error));
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT);
