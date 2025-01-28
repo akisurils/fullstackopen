@@ -23,6 +23,7 @@ const phoneNumberSchema = mongoose.Schema({
         required: true,
         validate: {
             validator: (v) => {
+                // Match: numeric 2 or 3, follow by -, follow by 1 or more digits
                 return /\d{2,3}-\d+/.test(v);
             },
             message: (props) =>
