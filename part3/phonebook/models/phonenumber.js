@@ -17,7 +17,18 @@ const phoneNumberSchema = mongoose.Schema({
         minLength: 3,
         required: true,
     },
-    number: String,
+    number: {
+        type: String,
+        minLength: 8,
+        required: true,
+        validate: {
+            validator: (v) => {
+                return /\d{2,3}-\d+/.test(v);
+            },
+            message: (props) =>
+                `${props.value} is not valid. Number must have at least 8 digits with "-" seperate at second or third digit.`,
+        },
+    },
 });
 
 mongoose.set("toJSON", {
