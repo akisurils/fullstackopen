@@ -84,9 +84,19 @@ const AddPersonForm = ({ persons, setPersons, setMessage }) => {
             number: newPhoneNumber,
         };
 
-        phoneService.addPhone(newPerson).then(() => {
-            setPersons(persons.concat(newPerson));
-        });
+        phoneService
+            .addPhone(newPerson)
+            .then(() => {
+                setPersons(persons.concat(newPerson));
+                notifyAction(
+                    `${newName} has been added to the phonebook.`,
+                    false
+                );
+            })
+            .catch((error) => {
+                notifyAction(error.response.data.error, true);
+                // console.log(error);
+            });
 
         setNewPhoneNumber("");
         setNewName("");
@@ -152,7 +162,6 @@ const AddPersonForm = ({ persons, setPersons, setMessage }) => {
         }
 
         addPerson();
-        notifyAction(`${newName} has been added to the phonebook.`, false);
     };
 
     return (
