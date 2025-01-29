@@ -10,7 +10,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd ../introdemo && npm run build && @powershell Copy-Item dist -Recurse ../intronode"
+    "build:ui": "@powershell Remove-Item -Recurse -Force dist && cd ../introdemo && npm run build && @powershell Copy-Item dist -Recurse ../intronode",
+    "eslint": "eslint ."
   },
   "dependencies": {
     "cors": "^2.8.5",
