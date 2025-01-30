@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-const password = process.argv[2];
 const url = process.env.VITE_MONGODB_URI;
 
 mongoose.set("strictQuery", false);
@@ -23,13 +22,15 @@ const phoneNumber = new PhoneNumber({
 if (process.argv.length === 5) {
     phoneNumber
         .save()
-        .then((result) => {
+        .then(() => {
             console.log(
                 `${process.argv[3]}'s number: ${process.argv[4]} has been saved to PhoneBook`
             );
             mongoose.connection.close();
         })
-        .catch((err) => {});
+        .catch((err) => {
+            console.log(err);
+        });
     return;
 }
 

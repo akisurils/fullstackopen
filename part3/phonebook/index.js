@@ -1,7 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 const PhoneNumber = require("./models/phonenumber");
 const { default: mongoose } = require("mongoose");
 
@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.static("dist"));
 app.use(cors());
 
-morgan.token("reqbody", (request, response) => {
+morgan.token("reqbody", (request) => {
     return JSON.stringify(request.body);
 });
 app.use(
@@ -60,7 +60,7 @@ app.get("/info", (request, response) => {
     );
 });
 
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", (request, response, next) => {
     PhoneNumber.find({})
         .then((phoneNumber) => {
             response.json(phoneNumber);
@@ -86,7 +86,7 @@ app.get("/api/persons/:id", (request, response, next) => {
         });
 });
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
     const id = request.params.id;
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return response.status(400).end("Invalid id");
@@ -122,7 +122,7 @@ app.post("/api/persons", (request, response, next) => {
             const newPhoneNumber = new PhoneNumber({ name, number });
             newPhoneNumber
                 .save()
-                .then((result) => {
+                .then(() => {
                     console.log("saved new phone number");
                     response.json(newPhoneNumber);
                 })
@@ -131,7 +131,7 @@ app.post("/api/persons", (request, response, next) => {
         .catch((error) => next(error));
 });
 
-app.put("/api/persons/:id", (request, response) => {
+app.put("/api/persons/:id", (request, response, next) => {
     const body = request.body;
     const name = body.name;
     const number = body.number;
