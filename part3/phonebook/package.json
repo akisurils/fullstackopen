@@ -21,6 +21,10 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@stylistic/eslint-plugin-js": "^3.0.1",
+    "eslint": "^9.19.0",
+    "globals": "^15.14.0",
     "nodemon": "^3.1.9"
   }
 }
