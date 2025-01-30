@@ -1,7 +1,6 @@
-const http = require("http");
 const express = require("express");
 const cors = require("cors");
-const dotenv = require("dotenv").config();
+require("dotenv").config();
 const Note = require("./models/note");
 const { default: mongoose } = require("mongoose");
 
@@ -98,13 +97,13 @@ app.delete("/api/notes/:id", (request, response) => {
     response.status(204).end();
 });
 
-const generatedId = () => {
-    const maxId =
-        notes.length > 0 //
-            ? Math.max(...notes.map((n) => Number(n.id)))
-            : 0;
-    return String(maxId + 1);
-};
+// const generatedId = () => {
+//     const maxId =
+//         notes.length > 0 //
+//             ? Math.max(...notes.map((n) => Number(n.id)))
+//             : 0;
+//     return String(maxId + 1);
+// };
 
 app.post("/api/notes", (request, response, next) => {
     const body = request.body;
@@ -118,7 +117,7 @@ app.post("/api/notes", (request, response, next) => {
     });
 
     note.save()
-        .then((result) => {
+        .then(() => {
             console.log(note);
             response.json(note);
         })
