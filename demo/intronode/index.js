@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
+const config = require("./utils/configs");
+const logger = require("./utils/loggers");
 const Note = require("./models/note");
 const { default: mongoose } = require("mongoose");
 
@@ -126,6 +127,5 @@ app.post("/api/notes", (request, response, next) => {
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT);
-console.log(`Server is running on port ${PORT}`);
+app.listen(config.PORT);
+logger.info(`Server is running on port ${config.PORT}`);
